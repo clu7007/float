@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gilded Archive | Le Journal Secret</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        /* * =========================================
+         * ROCOCO STYLESHEET - THE ROYAL PALETTE
+         * =========================================
+         */
+
+        :root {
+            /* Palette: Marie Antoinette's Dream */
+            --color-bg: #fff0f5; /* Lavender Blush */
+            --color-card: #fffbf0; /* Floral White */
+            --color-gold-dark: #b8860b;
+            --color-gold-light: #fcf6ba;
+            --color-gold-metallic: #d4af37;
+            --color-pink-soft: #f8c8dc;
+            --color-pink-deep: #e6a8d7;
+            --color-text-main: #4a4a4a;
+            --color-text-accent: #8b4513;
+            
+            /* Shadows for depth */
+            --shadow-soft: 0 10px 30px rgba(184, 134, 11, 0.15);
+            --shadow-hard: 5px 5px 0px rgba(212, 175, 55, 0.2);
+            --shadow-inner: inset 0 0 20px rgba(255, 240, 245, 0.8);
+            
+            /* Fonts */
+            --font-display: 'Great Vibes', cursive;
+            --font-header: 'Cinzel', serif;
+            --font-body: 'Playfair Display', serif;
+            --font-ui: 'Lato', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-gold-metallic) var(--color-bg);
+        }
+
+        /* Custom Scrollbar for Chrome/Safari - Pure Gold */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic));
+            border-radius: 10px;
+            border: 1px solid var(--color-gold-dark);
+        }
+
+        body {
+            background-color: var(--color-bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(248, 200, 220, 0.2) 0%, transparent 20%);
+            color: var(--color-text-main);
+            font-family: var(--font-body);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The Main Frame - Like a Painting */
+        #app-container {
+            width: 95vw;
+            height: 92vh;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--color-gold-metallic);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 0 4px var(--color-pink-soft),
+                0 0 0 6px var(--color-gold-metallic),
+                var(--shadow-soft);
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Decorative Corners */
+        #app-container::before, #app-container::after {
+            content: "❧";
+            position: absolute;
+            font-size: 4rem;
+            color: var(--color-gold-metallic);
+            font-family: var(--font-display);
+            z-index: 100;
+            pointer-events: none;
+        }
+        #app-container::before { top: -10px; left: 10px; transform: rotate(-45deg); }
+        #app-container::after { bottom: -10px; right: 10px; transform: rotate(135deg); }
+
+        /* * SIDEBAR - THE SALONS (Categories) 
+         */
+        aside.sidebar {
+            background: linear-gradient(180deg, #fffbf0 0%, #fff0f5 100%);
+            border-right: 1px solid var(--color-gold-metallic);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--color-gold-dark);
+            text-align: center;
+            text-shadow: 1px 1px 0px white;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+        
+        .brand-subtitle {
+            font-family: var(--font-header);
+            font-size: 0.7rem;
+            text-align: center;
+            letter-spacing: 3px;
+            color: var(--color-text-accent);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--color-gold-metallic);
+            padding-bottom: 10px;
+        }
+
+        .category-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .category-item {
+            font-family: var(--font-header);
+            font-size: 0.9rem;
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.4s ease;
+            border-radius: 8px;
+            position: relative;
+            color: var(--color-text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-item:hover {
+            background: white;
+            border-color: var(--color-pink-soft);
+            color: var(--color-gold-dark);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .category-item.active {
+            background: white;
+            border: 1px solid var(--color-gold-metallic);
+            color: var(--color-gold-dark);
+            font-weight: 700;
+        }
+
+        .category-item.active::after {
+            content: "⚜";
+            font-size: 1rem;
+        }
+
+        .add-category-btn {
+            margin-top: auto;
+            background: transparent;
+            border: 1px dashed var(--color-gold-metallic);
+            color: var(--color-text-accent);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--font-ui);
+            font-size: 0.8rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .add-category-btn:hover {
+            background: rgba(255,255,255,0.5);
+            border-style: solid;
+        }
+
+        /* * MAIN CONTENT - THE GALLERY
+         */
+        main.content {
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(255, 255, 255, 0.4);
+            position: relative;
+        }
+
+        /* Header Area */
+        header.top-bar {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .current-salon {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: var(--color-gold-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Input Area - The Composer */
+        .composer-area {
+            padding: 1.5rem 2rem;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .input-group {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        textarea.rococo-input {
+            width: 100%;
+            border: 1px solid var(--color-pink-deep);
+            border-radius: 5px;
+            padding: 10px;
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            resize: none;
+            height: 60px;
+            outline: none;
+            background: var(--color-card);
+            transition: 0.3s;
+        }
+
+        textarea.rococo-input:focus {
+            border-color: var(--color-gold-metallic);
+            box-shadow: 0 0 8px var(--color-pink-soft);
+        }
+
+        .post-btn {
+            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark));
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            height: 60px;
+            border-radius: 5px;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
+        }
+        
+        .post-btn::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        .post-btn:hover::after {
+            left: 100%;
+        }
+
+        /* The Feed */
+        .feed-container {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Post Card Style */
+        .treasure-card {
+            background: white;
+            border: 1px solid var(--color-pink-soft);
+            border-radius: 10px;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 5px 5px 0 rgba(248, 200, 220, 0.5);
+            transition: transform 0.3s;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .treasure-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-gold-metallic);
+        }
+
+        .treasure-card::before {
+            content: "";
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed var(--color-pink-deep);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-timestamp {
+            font-family: var(--font-header);
+            font-size: 0.75rem;
+            color: var(--color-text-accent);
+            opacity: 0.7;
+        }
+
+        .card-content {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--color-text-main);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Link Styling */
+        .card-content a {
+            color: var(--color-gold-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--color-gold-metallic);
+            font-style: italic;
+            transition: 0.2s;
+        }
+        .card-content a:hover {
+            background-color: var(--color-gold-light);
+            color: black;
+        }
+
+        .card-actions {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            font-family: var(--font-header);
+            font-size: 0.7rem;
+            color: #cc8899;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+        .delete-btn:hover {
+            opacity: 1;
+            color: #d6336c;
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal for New Category */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: white;
+            padding: 2rem;
+            border: 2px solid var(--color-gold-metallic);
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            width: 400px;
+            text-align: center;
+        }
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--color-gold-dark);
+            margin-bottom: 1rem;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--color-pink-deep);
+            font-family: var(--font-header);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <aside class="sidebar">
+            <div>
+                <h1 class="brand-title">L'Archive</h1>
+                <div class="brand-subtitle">The Private Collection</div>
+            </div>
+
+            <ul class="category-list" id="categoryList">
+                </ul>
+
+            <button class="add-category-btn" onclick="openModal()">+ Construct New Salon</button>
+        </aside>
+
+        <main class="content">
+            <header class="top-bar">
+                <div class="current-salon" id="currentSalonTitle">
+                    <span>⚜</span> <span id="salonNameDisplay">General Salon</span>
+                </div>
+                <div style="font-family: var(--font-header); font-size: 0.8rem; color: var(--color-text-accent);">
+                    <span id="itemCount">0</span> Treasures Stored
+                </div>
+            </header>
+
+            <div class="feed-container" id="feedContainer">
+                </div>
+
+            <div class="composer-area">
+                <div class="input-group">
+                    <textarea id="postInput" class="rococo-input" placeholder="Whisper your findings here, darling..."></textarea>
+                </div>
+                <button class="post-btn" onclick="addTreasure()">Preserve</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal-box">
+            <h2 class="modal-title">New Salon</h2>
+            <input type="text" id="newCategoryInput" class="modal-input" placeholder="Name your sanctuary...">
+            <button class="post-btn" onclick="addCategory()">Create</button>
+            <button class="delete-btn" onclick="closeModal()" style="display:block; margin: 10px auto;">Dismiss</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * =========================================
+         * THE ARCHIVIST ENGINE (JavaScript)
+         * Handles data persistence, rendering, and logic.
+         * =========================================
+         */
+
+        // Initial Data Structure
+        const DEFAULT_DATA = {
+            currentCategory: 'General Salon',
+            categories: ['General Salon', 'Visual Arts', 'Philosophy', 'Ephemeral Memes'],
+            posts: [] // { id, category, content, timestamp }
+        };
+
+        // State Management
+        let appData = JSON.parse(localStorage.getItem('rococoArchiveData')) || DEFAULT_DATA;
+
+        /**
+         * Initialize the application
+         */
+        function init() {
+            renderCategories();
+            renderPosts();
+            updateHeader();
+        }
+
+        /**
+         * Save current state to LocalStorage
+         */
+        function saveToStorage() {
+            localStorage.setItem('rococoArchiveData', JSON.stringify(appData));
+        }
+
+        /**
+         * Render the Sidebar Categories
+         */
+        function renderCategories() {
+            const list = document.getElementById('categoryList');
+            list.innerHTML = '';
+
+            appData.categories.forEach(cat => {
+                const li = document.createElement('li');
+                li.className = `category-item ${cat === appData.currentCategory ? 'active' : ''}`;
+                li.innerText = cat;
+                li.onclick = () => switchCategory(cat);
+                list.appendChild(li);
+            });
+        }
+
+        /**
+         * Switch the active "Salon"
+         */
+        function switchCategory(categoryName) {
+            appData.currentCategory = categoryName;
+            saveToStorage();
+            renderCategories();
+            renderPosts();
+            updateHeader();
+        }
+
+        /**
+         * Update the Header Text
+         */
+        function updateHeader() {
+            document.getElementById('salonNameDisplay').innerText = appData.currentCategory;
+            const count = appData.posts.filter(p => p.category === appData.currentCategory).length;
+            document.getElementById('itemCount').innerText = count;
+        }
+
+        /**
+         * Detect URLs and convert to anchor tags (Auto-Linker)
+         */
+        function linkify(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank" title="Open this treasure">${url}</a>`;
+            });
+        }
+
+        /**
+         * Render Posts for the current Category
+         */
+        function renderPosts() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '';
+
+            // Filter posts for current category and reverse to show newest first
+            const filteredPosts = appData.posts
+                .filter(p => p.category === appData.currentCategory)
+                .reverse();
+
+            if (filteredPosts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 2rem; opacity: 0.5; margin-top: 50px;">
+                        This salon is empty.<br>Fill it with beauty.
+                    </div>
+                `;
+                return;
+            }
+
+            filteredPosts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'treasure-card';
+                
+                // Format Date: "Wednesday, 12th October" style
+                const dateObj = new Date(post.timestamp);
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
+                const dateString = dateObj.toLocaleDateString('en-GB', options);
+
+                const contentHtml = linkify(post.content);
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-timestamp">Recorded on ${dateString}</span>
+                        <span style="color:var(--color-gold-dark)">✦</span>
+                    </div>
+                    <div class="card-content">${contentHtml}</div>
+                    <div class="card-actions">
+                        <button class="delete-btn" onclick="deletePost(${post.id})">Discard from Memory</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        /**
+         * Add a new Treasure (Post)
+         */
+        function addTreasure() {
+            const input = document.getElementById('postInput');
+            const content = input.value.trim();
+
+            if (!content) return;
+
+            const newPost = {
+                id: Date.now(),
+                category: appData.currentCategory,
+                content: content,
+                timestamp: Date.now()
+            };
+
+            appData.posts.push(newPost);
+            saveToStorage();
+            
+            input.value = ''; // Clear input
+            renderPosts();
+            updateHeader();
+        }
+
+        /**
+         * Delete a specific post
+         */
+        function deletePost(id) {
+            if(confirm("Are you certain you wish to discard this treasure?")) {
+                appData.posts = appData.posts.filter(p => p.id !== id);
+                saveToStorage();
+                renderPosts();
+                updateHeader();
+            }
+        }
+
+        /**
+         * Modal Logic
+         */
+        function openModal() {
+            document.getElementById('categoryModal').classList.add('open');
+            document.getElementById('newCategoryInput').focus();
+        }
+        function closeModal() {
+            document.getElementById('categoryModal').classList.remove('open');
+        }
+
+        /**
+         * Add a new Category
+         */
+        function addCategory() {
+            const input = document.getElementById('newCategoryInput');
+            const name = input.value.trim();
+
+            if (name && !appData.categories.includes(name)) {
+                appData.categories.push(name);
+                saveToStorage();
+                renderCategories();
+                closeModal();
+                switchCategory(name);
+                input.value = '';
+            } else if (appData.categories.includes(name)) {
+                alert("That salon already exists, darling.");
+            }
+        }
+
+        // Allow Ctrl+Enter to submit
+        document.getElementById('postInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                addTreasure();
+            }
+        });
+        
+        // Allow Enter to submit category
+        document.getElementById('newCategoryInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                addCategory();
+            }
+        });
+
+        // Initialize on load
+        init();
+
+    </script>
+</body>
+</html>
