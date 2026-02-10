@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         /* * =========================================
          * ROCOCO STYLESHEET - THE ROYAL PALETTE
@@ -92,6 +95,19 @@
             position: relative;
         }
 
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            #app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            aside.sidebar {
+                display: none; /* Hidden on mobile for simplicity, or use a toggle */
+            }
+            /* Note: To change categories on mobile, in a full app we'd add a menu button. 
+               For this version, it defaults to the main salon on mobile. */
+        }
+
         /* Decorative Corners */
         #app-container::before, #app-container::after {
             content: "❧";
@@ -143,6 +159,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
+            overflow-y: auto;
         }
 
         .category-item {
@@ -435,6 +452,20 @@
             font-family: var(--font-header);
         }
 
+        /* Loading Indicator */
+        .loading {
+            text-align: center;
+            color: var(--color-gold-dark);
+            font-family: var(--font-header);
+            margin-top: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
     </style>
 </head>
 <body>
@@ -443,7 +474,7 @@
         <aside class="sidebar">
             <div>
                 <h1 class="brand-title">L'Archive</h1>
-                <div class="brand-subtitle">The Private Collection</div>
+                <div class="brand-subtitle">Cloud Collection</div>
             </div>
 
             <ul class="category-list" id="categoryList">
@@ -454,20 +485,21 @@
 
         <main class="content">
             <header class="top-bar">
-                <div class="current-salon" id="currentSalonTitle">
-                    <span>⚜</span> <span id="salonNameDisplay">General Salon</span>
+                <div class="current-salon">
+                    <span>⚜</span> <span id="salonNameDisplay">Loading...</span>
                 </div>
                 <div style="font-family: var(--font-header); font-size: 0.8rem; color: var(--color-text-accent);">
-                    <span id="itemCount">0</span> Treasures Stored
+                    <span id="itemCount">...</span> Treasures
                 </div>
             </header>
 
             <div class="feed-container" id="feedContainer">
-                </div>
+                <div class="loading">Connecting to the Vault...</div>
+            </div>
 
             <div class="composer-area">
                 <div class="input-group">
-                    <textarea id="postInput" class="rococo-input" placeholder="Whisper your findings here, darling..."></textarea>
+                    <textarea id="postInput" class="rococo-input" placeholder="Whisper your findings to the cloud..."></textarea>
                 </div>
                 <button class="post-btn" onclick="addTreasure()">Preserve</button>
             </div>
@@ -487,96 +519,126 @@
         /**
          * =========================================
          * THE ARCHIVIST ENGINE (JavaScript)
-         * Handles data persistence, rendering, and logic.
+         * Now powered by the Cloud (Firebase)
          * =========================================
          */
 
-        // Initial Data Structure
-        const DEFAULT_DATA = {
-            currentCategory: 'General Salon',
-            categories: ['General Salon', 'Visual Arts', 'Philosophy', 'Ephemeral Memes'],
-            posts: [] // { id, category, content, timestamp }
+        // ⚜️ THE ROYAL CONFIGURATION ⚜️
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeL-QQjnuSO3ONLOOzYlgcBvta1WRp2N0",
+            authDomain: "float-3a26d.firebaseapp.com",
+            projectId: "float-3a26d",
+            storageBucket: "float-3a26d.firebasestorage.app",
+            messagingSenderId: "240406501242",
+            appId: "1:240406501242:web:03c6f2bd9ff188151668c3"
         };
 
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (error) {
+            console.error("Firebase Initialization Error:", error);
+            alert("The connection to the palace has failed. Please check the console.");
+        }
+
+        const db = firebase.firestore();
+
         // State Management
-        let appData = JSON.parse(localStorage.getItem('rococoArchiveData')) || DEFAULT_DATA;
+        let currentCategory = 'General Salon';
+        let categories = ['General Salon']; // Default state until loaded
+        let unsubscribePosts = null; // To handle listener cleanup
+
+        // DOM Elements
+        const feedContainer = document.getElementById('feedContainer');
+        const categoryList = document.getElementById('categoryList');
+        const salonTitle = document.getElementById('salonNameDisplay');
+        const itemCount = document.getElementById('itemCount');
 
         /**
-         * Initialize the application
+         * 1. LISTEN TO CATEGORIES (Real-time)
+         * We store valid categories in a single document: 'meta/categories'
          */
-        function init() {
-            renderCategories();
-            renderPosts();
-            updateHeader();
+        function initCategories() {
+            const catRef = db.collection('meta').doc('categories');
+
+            catRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    categories = doc.data().list || ['General Salon'];
+                } else {
+                    // First time setup: create default structure in cloud
+                    catRef.set({ list: ['General Salon'] });
+                    categories = ['General Salon'];
+                }
+                renderCategories();
+            });
         }
 
         /**
-         * Save current state to LocalStorage
+         * 2. LISTEN TO POSTS (Real-time)
+         * Fetches posts for the current category
          */
-        function saveToStorage() {
-            localStorage.setItem('rococoArchiveData', JSON.stringify(appData));
+        function subscribePosts() {
+            // Detach previous listener to avoid memory leaks
+            if (unsubscribePosts) {
+                unsubscribePosts();
+            }
+
+            feedContainer.innerHTML = '<div class="loading">Fetching Treasures...</div>';
+
+            // Query: Collection 'posts', where 'category' matches, sorted by time
+            unsubscribePosts = db.collection('posts')
+                .where('category', '==', currentCategory)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot((snapshot) => {
+                    renderPosts(snapshot);
+                }, (error) => {
+                    console.error("Error fetching posts:", error);
+                    // Handle "Missing Index" error gracefully
+                    if(error.code === 'failed-precondition') {
+                        feedContainer.innerHTML = `
+                            <div class="loading" style="color:red">
+                                ⚜️ Action Required ⚜️<br>
+                                Please open Developer Tools (F12) -> Console.<br>
+                                Click the link provided by Firebase to build the index.
+                            </div>
+                        `;
+                    }
+                });
         }
 
         /**
          * Render the Sidebar Categories
          */
         function renderCategories() {
-            const list = document.getElementById('categoryList');
-            list.innerHTML = '';
-
-            appData.categories.forEach(cat => {
+            categoryList.innerHTML = '';
+            categories.forEach(cat => {
                 const li = document.createElement('li');
-                li.className = `category-item ${cat === appData.currentCategory ? 'active' : ''}`;
+                li.className = `category-item ${cat === currentCategory ? 'active' : ''}`;
                 li.innerText = cat;
                 li.onclick = () => switchCategory(cat);
-                list.appendChild(li);
+                categoryList.appendChild(li);
             });
         }
 
         /**
          * Switch the active "Salon"
          */
-        function switchCategory(categoryName) {
-            appData.currentCategory = categoryName;
-            saveToStorage();
-            renderCategories();
-            renderPosts();
-            updateHeader();
-        }
-
-        /**
-         * Update the Header Text
-         */
-        function updateHeader() {
-            document.getElementById('salonNameDisplay').innerText = appData.currentCategory;
-            const count = appData.posts.filter(p => p.category === appData.currentCategory).length;
-            document.getElementById('itemCount').innerText = count;
-        }
-
-        /**
-         * Detect URLs and convert to anchor tags (Auto-Linker)
-         */
-        function linkify(text) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, function(url) {
-                return `<a href="${url}" target="_blank" title="Open this treasure">${url}</a>`;
-            });
+        function switchCategory(cat) {
+            currentCategory = cat;
+            salonTitle.innerText = cat;
+            renderCategories(); // Update visual active state
+            subscribePosts(); // Switch the data stream
         }
 
         /**
          * Render Posts for the current Category
          */
-        function renderPosts() {
-            const container = document.getElementById('feedContainer');
-            container.innerHTML = '';
+        function renderPosts(snapshot) {
+            feedContainer.innerHTML = '';
+            itemCount.innerText = snapshot.size;
 
-            // Filter posts for current category and reverse to show newest first
-            const filteredPosts = appData.posts
-                .filter(p => p.category === appData.currentCategory)
-                .reverse();
-
-            if (filteredPosts.length === 0) {
-                container.innerHTML = `
+            if (snapshot.empty) {
+                feedContainer.innerHTML = `
                     <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 2rem; opacity: 0.5; margin-top: 50px;">
                         This salon is empty.<br>Fill it with beauty.
                     </div>
@@ -584,14 +646,18 @@
                 return;
             }
 
-            filteredPosts.forEach(post => {
+            snapshot.forEach(doc => {
+                const post = doc.data();
                 const card = document.createElement('div');
                 card.className = 'treasure-card';
                 
-                // Format Date: "Wednesday, 12th October" style
-                const dateObj = new Date(post.timestamp);
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
-                const dateString = dateObj.toLocaleDateString('en-GB', options);
+                // Format Date safely
+                let dateString = "Unknown Date";
+                if (post.timestamp) {
+                    const dateObj = post.timestamp.toDate();
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
+                    dateString = dateObj.toLocaleDateString('en-GB', options);
+                }
 
                 const contentHtml = linkify(post.content);
 
@@ -602,15 +668,26 @@
                     </div>
                     <div class="card-content">${contentHtml}</div>
                     <div class="card-actions">
-                        <button class="delete-btn" onclick="deletePost(${post.id})">Discard from Memory</button>
+                        <button class="delete-btn" onclick="deletePost('${doc.id}')">Discard from Memory</button>
                     </div>
                 `;
-                container.appendChild(card);
+                feedContainer.appendChild(card);
             });
         }
 
         /**
-         * Add a new Treasure (Post)
+         * Detect URLs and convert to anchor tags (Auto-Linker)
+         */
+        function linkify(text) {
+            if (!text) return "";
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank" title="Open this treasure">${url}</a>`;
+            });
+        }
+
+        /**
+         * Add a new Treasure (Post) to Cloud
          */
         function addTreasure() {
             const input = document.getElementById('postInput');
@@ -618,30 +695,54 @@
 
             if (!content) return;
 
-            const newPost = {
-                id: Date.now(),
-                category: appData.currentCategory,
+            // Send to Firestore
+            db.collection('posts').add({
+                category: currentCategory,
                 content: content,
-                timestamp: Date.now()
-            };
-
-            appData.posts.push(newPost);
-            saveToStorage();
-            
-            input.value = ''; // Clear input
-            renderPosts();
-            updateHeader();
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                input.value = ''; // Clear input on success
+            }).catch((error) => {
+                console.error("Error adding document: ", error);
+                alert("The Vault rejected your treasure. Please check your internet.");
+            });
         }
 
         /**
-         * Delete a specific post
+         * Delete a specific post from Cloud
          */
-        function deletePost(id) {
+        function deletePost(docId) {
             if(confirm("Are you certain you wish to discard this treasure?")) {
-                appData.posts = appData.posts.filter(p => p.id !== id);
-                saveToStorage();
-                renderPosts();
-                updateHeader();
+                db.collection('posts').doc(docId).delete().catch(error => {
+                    console.error("Error removing document: ", error);
+                });
+            }
+        }
+
+        /**
+         * Add a new Category to Cloud
+         */
+        function addCategory() {
+            const input = document.getElementById('newCategoryInput');
+            const name = input.value.trim();
+
+            if (name && !categories.includes(name)) {
+                const newList = [...categories, name];
+                
+                // Update the central list in Firestore
+                db.collection('meta').doc('categories').set({
+                    list: newList
+                }).then(() => {
+                    closeModal();
+                    switchCategory(name);
+                    input.value = '';
+                }).catch(error => {
+                    console.error("Error updating categories: ", error);
+                    alert("Could not build new salon.");
+                });
+
+            } else if (categories.includes(name)) {
+                alert("That salon already exists, darling.");
             }
         }
 
@@ -656,41 +757,23 @@
             document.getElementById('categoryModal').classList.remove('open');
         }
 
-        /**
-         * Add a new Category
-         */
-        function addCategory() {
-            const input = document.getElementById('newCategoryInput');
-            const name = input.value.trim();
-
-            if (name && !appData.categories.includes(name)) {
-                appData.categories.push(name);
-                saveToStorage();
-                renderCategories();
-                closeModal();
-                switchCategory(name);
-                input.value = '';
-            } else if (appData.categories.includes(name)) {
-                alert("That salon already exists, darling.");
-            }
-        }
-
-        // Allow Ctrl+Enter to submit
+        // Keyboard Shortcuts
         document.getElementById('postInput').addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 addTreasure();
             }
         });
         
-        // Allow Enter to submit category
         document.getElementById('newCategoryInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 addCategory();
             }
         });
 
-        // Initialize on load
-        init();
+        // Initialize App
+        salonTitle.innerText = currentCategory;
+        initCategories();
+        subscribePosts();
 
     </script>
 </body>
