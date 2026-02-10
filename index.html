@@ -14,14 +14,13 @@
 
     <style>
         /* * =========================================
-         * ROCOCO STYLESHEET - THE ROYAL PALETTE
+         * ROCOCO STYLESHEET
          * =========================================
          */
 
         :root {
-            /* Palette: Marie Antoinette's Dream */
-            --color-bg: #fff0f5; /* Lavender Blush */
-            --color-card: #fffbf0; /* Floral White */
+            --color-bg: #fff0f5; 
+            --color-card: #fffbf0; 
             --color-gold-dark: #b8860b;
             --color-gold-light: #fcf6ba;
             --color-gold-metallic: #d4af37;
@@ -30,38 +29,19 @@
             --color-text-main: #4a4a4a;
             --color-text-accent: #8b4513;
             
-            /* Shadows for depth */
             --shadow-soft: 0 10px 30px rgba(184, 134, 11, 0.15);
-            --shadow-hard: 5px 5px 0px rgba(212, 175, 55, 0.2);
-            --shadow-inner: inset 0 0 20px rgba(255, 240, 245, 0.8);
             
-            /* Fonts */
             --font-display: 'Great Vibes', cursive;
             --font-header: 'Cinzel', serif;
             --font-body: 'Playfair Display', serif;
             --font-ui: 'Lato', sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scrollbar-width: thin;
-            scrollbar-color: var(--color-gold-metallic) var(--color-bg);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--color-gold-metallic) var(--color-bg); }
 
-        /* Custom Scrollbar for Chrome/Safari - Pure Gold */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--color-bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic));
-            border-radius: 10px;
-            border: 1px solid var(--color-gold-dark);
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--color-bg); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic)); border-radius: 10px; border: 1px solid var(--color-gold-dark); }
 
         body {
             background-color: var(--color-bg);
@@ -77,7 +57,6 @@
             align-items: center;
         }
 
-        /* The Main Frame - Like a Painting */
         #app-container {
             width: 95vw;
             height: 92vh;
@@ -95,34 +74,17 @@
             position: relative;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            #app-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
-            aside.sidebar {
-                display: none; /* Hidden on mobile for simplicity, or use a toggle */
-            }
-            /* Note: To change categories on mobile, in a full app we'd add a menu button. 
-               For this version, it defaults to the main salon on mobile. */
+            #app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+            aside.sidebar { display: none; }
         }
 
-        /* Decorative Corners */
         #app-container::before, #app-container::after {
-            content: "❧";
-            position: absolute;
-            font-size: 4rem;
-            color: var(--color-gold-metallic);
-            font-family: var(--font-display);
-            z-index: 100;
-            pointer-events: none;
+            content: "❧"; position: absolute; font-size: 4rem; color: var(--color-gold-metallic); font-family: var(--font-display); z-index: 100; pointer-events: none;
         }
         #app-container::before { top: -10px; left: 10px; transform: rotate(-45deg); }
         #app-container::after { bottom: -10px; right: 10px; transform: rotate(135deg); }
 
-        /* * SIDEBAR - THE SALONS (Categories) 
-         */
         aside.sidebar {
             background: linear-gradient(180deg, #fffbf0 0%, #fff0f5 100%);
             border-right: 1px solid var(--color-gold-metallic);
@@ -133,338 +95,72 @@
             position: relative;
         }
 
-        .brand-title {
-            font-family: var(--font-display);
-            font-size: 3rem;
-            color: var(--color-gold-dark);
-            text-align: center;
-            text-shadow: 1px 1px 0px white;
-            margin-bottom: 1rem;
-            line-height: 1;
-        }
-        
-        .brand-subtitle {
-            font-family: var(--font-header);
-            font-size: 0.7rem;
-            text-align: center;
-            letter-spacing: 3px;
-            color: var(--color-text-accent);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--color-gold-metallic);
-            padding-bottom: 10px;
-        }
+        .brand-title { font-family: var(--font-display); font-size: 3rem; color: var(--color-gold-dark); text-align: center; text-shadow: 1px 1px 0px white; margin-bottom: 1rem; line-height: 1; }
+        .brand-subtitle { font-family: var(--font-header); font-size: 0.7rem; text-align: center; letter-spacing: 3px; color: var(--color-text-accent); text-transform: uppercase; border-bottom: 1px solid var(--color-gold-metallic); padding-bottom: 10px; }
 
-        .category-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            overflow-y: auto;
-        }
-
+        .category-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; overflow-y: auto; }
         .category-item {
-            font-family: var(--font-header);
-            font-size: 0.9rem;
-            padding: 10px 15px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.4s ease;
-            border-radius: 8px;
-            position: relative;
-            color: var(--color-text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-family: var(--font-header); font-size: 0.9rem; padding: 10px 15px; cursor: pointer; border: 1px solid transparent; transition: all 0.4s ease; border-radius: 8px; position: relative; color: var(--color-text-main); display: flex; justify-content: space-between; align-items: center;
         }
-
-        .category-item:hover {
-            background: white;
-            border-color: var(--color-pink-soft);
-            color: var(--color-gold-dark);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .category-item.active {
-            background: white;
-            border: 1px solid var(--color-gold-metallic);
-            color: var(--color-gold-dark);
-            font-weight: 700;
-        }
-
-        .category-item.active::after {
-            content: "⚜";
-            font-size: 1rem;
-        }
+        .category-item:hover { background: white; border-color: var(--color-pink-soft); color: var(--color-gold-dark); box-shadow: var(--shadow-soft); }
+        .category-item.active { background: white; border: 1px solid var(--color-gold-metallic); color: var(--color-gold-dark); font-weight: 700; }
+        .category-item.active::after { content: "⚜"; font-size: 1rem; }
 
         .add-category-btn {
-            margin-top: auto;
-            background: transparent;
-            border: 1px dashed var(--color-gold-metallic);
-            color: var(--color-text-accent);
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: var(--font-ui);
-            font-size: 0.8rem;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: auto; background: transparent; border: 1px dashed var(--color-gold-metallic); color: var(--color-text-accent); padding: 10px; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: 0.8rem; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
-        .add-category-btn:hover {
-            background: rgba(255,255,255,0.5);
-            border-style: solid;
-        }
+        .add-category-btn:hover { background: rgba(255,255,255,0.5); border-style: solid; }
 
-        /* * MAIN CONTENT - THE GALLERY
-         */
-        main.content {
-            display: flex;
-            flex-direction: column;
-            background-color: rgba(255, 255, 255, 0.4);
-            position: relative;
-        }
+        main.content { display: flex; flex-direction: column; background-color: rgba(255, 255, 255, 0.4); position: relative; }
 
-        /* Header Area */
-        header.top-bar {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-        }
+        header.top-bar { padding: 1.5rem 2rem; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); }
+        .current-salon { font-family: var(--font-header); font-size: 1.5rem; color: var(--color-gold-dark); display: flex; align-items: center; gap: 10px; }
 
-        .current-salon {
-            font-family: var(--font-header);
-            font-size: 1.5rem;
-            color: var(--color-gold-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Input Area - The Composer */
-        .composer-area {
-            padding: 1.5rem 2rem;
-            background: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .input-group {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .composer-area { padding: 1.5rem 2rem; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; gap: 1rem; align-items: flex-start; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+        .input-group { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
         textarea.rococo-input {
-            width: 100%;
-            border: 1px solid var(--color-pink-deep);
-            border-radius: 5px;
-            padding: 10px;
-            font-family: var(--font-ui);
-            font-size: 1rem;
-            resize: none;
-            height: 60px;
-            outline: none;
-            background: var(--color-card);
-            transition: 0.3s;
+            width: 100%; border: 1px solid var(--color-pink-deep); border-radius: 5px; padding: 10px; font-family: var(--font-ui); font-size: 1rem; resize: none; height: 60px; outline: none; background: var(--color-card); transition: 0.3s;
         }
-
-        textarea.rococo-input:focus {
-            border-color: var(--color-gold-metallic);
-            box-shadow: 0 0 8px var(--color-pink-soft);
-        }
+        textarea.rococo-input:focus { border-color: var(--color-gold-metallic); box-shadow: 0 0 8px var(--color-pink-soft); }
 
         .post-btn {
-            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark));
-            color: white;
-            border: none;
-            padding: 0 2rem;
-            height: 60px;
-            border-radius: 5px;
-            font-family: var(--font-header);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark)); color: white; border: none; padding: 0 2rem; height: 60px; border-radius: 5px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
         }
-        
-        .post-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
-        }
-        
+        .post-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3); }
         .post-btn::after {
-            content: "";
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: 0.5s;
+            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s;
         }
-        .post-btn:hover::after {
-            left: 100%;
-        }
+        .post-btn:hover::after { left: 100%; }
 
-        /* The Feed */
-        .feed-container {
-            flex-grow: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            scroll-behavior: smooth;
-        }
+        .feed-container { flex-grow: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; scroll-behavior: smooth; }
 
-        /* Post Card Style */
         .treasure-card {
-            background: white;
-            border: 1px solid var(--color-pink-soft);
-            border-radius: 10px;
-            padding: 1.5rem;
-            position: relative;
-            box-shadow: 5px 5px 0 rgba(248, 200, 220, 0.5);
-            transition: transform 0.3s;
-            animation: fadeIn 0.5s ease-out;
+            background: white; border: 1px solid var(--color-pink-soft); border-radius: 10px; padding: 1.5rem; position: relative; box-shadow: 5px 5px 0 rgba(248, 200, 220, 0.5); transition: transform 0.3s; animation: fadeIn 0.5s ease-out;
         }
-
-        .treasure-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--color-gold-metallic);
-        }
-
+        .treasure-card:hover { transform: translateY(-3px); border-color: var(--color-gold-metallic); }
         .treasure-card::before {
-            content: "";
-            position: absolute;
-            top: 5px; left: 5px; right: 5px; bottom: 5px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 8px;
-            pointer-events: none;
+            content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; pointer-events: none;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            border-bottom: 1px dashed var(--color-pink-deep);
-            padding-bottom: 0.5rem;
-        }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--color-pink-deep); padding-bottom: 0.5rem; }
+        .card-timestamp { font-family: var(--font-header); font-size: 0.75rem; color: var(--color-text-accent); opacity: 0.7; }
+        .card-content { font-family: var(--font-body); font-size: 1.1rem; line-height: 1.6; color: var(--color-text-main); white-space: pre-wrap; word-wrap: break-word; }
+        .card-content a { color: var(--color-gold-dark); text-decoration: none; border-bottom: 1px solid var(--color-gold-metallic); font-style: italic; transition: 0.2s; }
+        .card-content a:hover { background-color: var(--color-gold-light); color: black; }
+        .card-actions { margin-top: 1rem; display: flex; justify-content: flex-end; }
+        .delete-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.7rem; color: #cc8899; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .delete-btn:hover { opacity: 1; color: #d6336c; text-decoration: underline; }
 
-        .card-timestamp {
-            font-family: var(--font-header);
-            font-size: 0.75rem;
-            color: var(--color-text-accent);
-            opacity: 0.7;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-content {
-            font-family: var(--font-body);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: var(--color-text-main);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        /* Link Styling */
-        .card-content a {
-            color: var(--color-gold-dark);
-            text-decoration: none;
-            border-bottom: 1px solid var(--color-gold-metallic);
-            font-style: italic;
-            transition: 0.2s;
-        }
-        .card-content a:hover {
-            background-color: var(--color-gold-light);
-            color: black;
-        }
-
-        .card-actions {
-            margin-top: 1rem;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            font-family: var(--font-header);
-            font-size: 0.7rem;
-            color: #cc8899;
-            cursor: pointer;
-            opacity: 0.5;
-            transition: 0.3s;
-        }
-        .delete-btn:hover {
-            opacity: 1;
-            color: #d6336c;
-            text-decoration: underline;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Modal for New Category */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.open { display: flex; }
+        .modal-box { background: white; padding: 2rem; border: 2px solid var(--color-gold-metallic); border-radius: 15px; box-shadow: var(--shadow-soft); width: 400px; text-align: center; }
+        .modal-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-gold-dark); margin-bottom: 1rem; }
+        .modal-input { width: 100%; padding: 10px; margin-bottom: 1rem; border: 1px solid var(--color-pink-deep); font-family: var(--font-header); }
 
-        .modal-box {
-            background: white;
-            padding: 2rem;
-            border: 2px solid var(--color-gold-metallic);
-            border-radius: 15px;
-            box-shadow: var(--shadow-soft);
-            width: 400px;
-            text-align: center;
-        }
-        .modal-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            color: var(--color-gold-dark);
-            margin-bottom: 1rem;
-        }
-        .modal-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 1rem;
-            border: 1px solid var(--color-pink-deep);
-            font-family: var(--font-header);
-        }
-
-        /* Loading Indicator */
-        .loading {
-            text-align: center;
-            color: var(--color-gold-dark);
-            font-family: var(--font-header);
-            margin-top: 20px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
+        .loading { text-align: center; color: var(--color-gold-dark); font-family: var(--font-header); margin-top: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
     </style>
 </head>
@@ -518,12 +214,10 @@
     <script>
         /**
          * =========================================
-         * THE ARCHIVIST ENGINE (JavaScript)
-         * Now powered by the Cloud (Firebase)
+         * THE ARCHIVIST ENGINE (Bypass Edition)
          * =========================================
          */
 
-        // ⚜️ THE ROYAL CONFIGURATION ⚜️
         const firebaseConfig = {
             apiKey: "AIzaSyBeL-QQjnuSO3ONLOOzYlgcBvta1WRp2N0",
             authDomain: "float-3a26d.firebaseapp.com",
@@ -538,15 +232,14 @@
             firebase.initializeApp(firebaseConfig);
         } catch (error) {
             console.error("Firebase Initialization Error:", error);
-            alert("The connection to the palace has failed. Please check the console.");
         }
 
         const db = firebase.firestore();
 
         // State Management
         let currentCategory = 'General Salon';
-        let categories = ['General Salon']; // Default state until loaded
-        let unsubscribePosts = null; // To handle listener cleanup
+        let categories = ['General Salon']; 
+        let unsubscribePosts = null;
 
         // DOM Elements
         const feedContainer = document.getElementById('feedContainer');
@@ -555,8 +248,7 @@
         const itemCount = document.getElementById('itemCount');
 
         /**
-         * 1. LISTEN TO CATEGORIES (Real-time)
-         * We store valid categories in a single document: 'meta/categories'
+         * 1. LISTEN TO CATEGORIES
          */
         function initCategories() {
             const catRef = db.collection('meta').doc('categories');
@@ -565,7 +257,6 @@
                 if (doc.exists) {
                     categories = doc.data().list || ['General Salon'];
                 } else {
-                    // First time setup: create default structure in cloud
                     catRef.set({ list: ['General Salon'] });
                     categories = ['General Salon'];
                 }
@@ -574,41 +265,42 @@
         }
 
         /**
-         * 2. LISTEN TO POSTS (Real-time)
-         * Fetches posts for the current category
+         * 2. LISTEN TO POSTS (FIXED for No Index Required)
          */
         function subscribePosts() {
-            // Detach previous listener to avoid memory leaks
             if (unsubscribePosts) {
                 unsubscribePosts();
             }
 
             feedContainer.innerHTML = '<div class="loading">Fetching Treasures...</div>';
 
-            // Query: Collection 'posts', where 'category' matches, sorted by time
+            // We do NOT use orderBy here to avoid the Red Text Error.
+            // We fetch filtering by category only.
             unsubscribePosts = db.collection('posts')
                 .where('category', '==', currentCategory)
-                .orderBy('timestamp', 'desc')
                 .onSnapshot((snapshot) => {
-                    renderPosts(snapshot);
+                    
+                    // Convert to array and Sort LOCALLY in JavaScript
+                    let posts = [];
+                    snapshot.forEach(doc => {
+                        posts.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Sort newest first (descending timestamp)
+                    posts.sort((a, b) => {
+                        const timeA = a.timestamp ? a.timestamp.seconds : 0;
+                        const timeB = b.timestamp ? b.timestamp.seconds : 0;
+                        return timeB - timeA;
+                    });
+
+                    renderPosts(posts);
+
                 }, (error) => {
                     console.error("Error fetching posts:", error);
-                    // Handle "Missing Index" error gracefully
-                    if(error.code === 'failed-precondition') {
-                        feedContainer.innerHTML = `
-                            <div class="loading" style="color:red">
-                                ⚜️ Action Required ⚜️<br>
-                                Please open Developer Tools (F12) -> Console.<br>
-                                Click the link provided by Firebase to build the index.
-                            </div>
-                        `;
-                    }
+                    feedContainer.innerHTML = `<div class="loading" style="color:red">Error: ${error.message}</div>`;
                 });
         }
 
-        /**
-         * Render the Sidebar Categories
-         */
         function renderCategories() {
             categoryList.innerHTML = '';
             categories.forEach(cat => {
@@ -620,24 +312,21 @@
             });
         }
 
-        /**
-         * Switch the active "Salon"
-         */
         function switchCategory(cat) {
             currentCategory = cat;
             salonTitle.innerText = cat;
-            renderCategories(); // Update visual active state
-            subscribePosts(); // Switch the data stream
+            renderCategories(); 
+            subscribePosts(); 
         }
 
         /**
-         * Render Posts for the current Category
+         * Render Posts (Now accepts an Array, not snapshot)
          */
-        function renderPosts(snapshot) {
+        function renderPosts(posts) {
             feedContainer.innerHTML = '';
-            itemCount.innerText = snapshot.size;
+            itemCount.innerText = posts.length;
 
-            if (snapshot.empty) {
+            if (posts.length === 0) {
                 feedContainer.innerHTML = `
                     <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 2rem; opacity: 0.5; margin-top: 50px;">
                         This salon is empty.<br>Fill it with beauty.
@@ -646,15 +335,13 @@
                 return;
             }
 
-            snapshot.forEach(doc => {
-                const post = doc.data();
+            posts.forEach(post => {
                 const card = document.createElement('div');
                 card.className = 'treasure-card';
                 
-                // Format Date safely
-                let dateString = "Unknown Date";
+                let dateString = "Just now";
                 if (post.timestamp) {
-                    const dateObj = post.timestamp.toDate();
+                    const dateObj = new Date(post.timestamp.seconds * 1000);
                     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
                     dateString = dateObj.toLocaleDateString('en-GB', options);
                 }
@@ -668,16 +355,13 @@
                     </div>
                     <div class="card-content">${contentHtml}</div>
                     <div class="card-actions">
-                        <button class="delete-btn" onclick="deletePost('${doc.id}')">Discard from Memory</button>
+                        <button class="delete-btn" onclick="deletePost('${post.id}')">Discard from Memory</button>
                     </div>
                 `;
                 feedContainer.appendChild(card);
             });
         }
 
-        /**
-         * Detect URLs and convert to anchor tags (Auto-Linker)
-         */
         function linkify(text) {
             if (!text) return "";
             const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -686,91 +370,51 @@
             });
         }
 
-        /**
-         * Add a new Treasure (Post) to Cloud
-         */
         function addTreasure() {
             const input = document.getElementById('postInput');
             const content = input.value.trim();
-
             if (!content) return;
 
-            // Send to Firestore
             db.collection('posts').add({
                 category: currentCategory,
                 content: content,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                input.value = ''; // Clear input on success
+                input.value = ''; 
             }).catch((error) => {
-                console.error("Error adding document: ", error);
-                alert("The Vault rejected your treasure. Please check your internet.");
+                console.error("Error adding: ", error);
+                alert("Connection failed.");
             });
         }
 
-        /**
-         * Delete a specific post from Cloud
-         */
         function deletePost(docId) {
-            if(confirm("Are you certain you wish to discard this treasure?")) {
-                db.collection('posts').doc(docId).delete().catch(error => {
-                    console.error("Error removing document: ", error);
-                });
+            if(confirm("Are you certain?")) {
+                db.collection('posts').doc(docId).delete();
             }
         }
 
-        /**
-         * Add a new Category to Cloud
-         */
         function addCategory() {
             const input = document.getElementById('newCategoryInput');
             const name = input.value.trim();
-
             if (name && !categories.includes(name)) {
                 const newList = [...categories, name];
-                
-                // Update the central list in Firestore
-                db.collection('meta').doc('categories').set({
-                    list: newList
-                }).then(() => {
-                    closeModal();
-                    switchCategory(name);
-                    input.value = '';
-                }).catch(error => {
-                    console.error("Error updating categories: ", error);
-                    alert("Could not build new salon.");
-                });
-
+                db.collection('meta').doc('categories').set({ list: newList })
+                    .then(() => {
+                        closeModal();
+                        switchCategory(name);
+                        input.value = '';
+                    });
             } else if (categories.includes(name)) {
-                alert("That salon already exists, darling.");
+                alert("That salon already exists.");
             }
         }
 
-        /**
-         * Modal Logic
-         */
-        function openModal() {
-            document.getElementById('categoryModal').classList.add('open');
-            document.getElementById('newCategoryInput').focus();
-        }
-        function closeModal() {
-            document.getElementById('categoryModal').classList.remove('open');
-        }
+        function openModal() { document.getElementById('categoryModal').classList.add('open'); document.getElementById('newCategoryInput').focus(); }
+        function closeModal() { document.getElementById('categoryModal').classList.remove('open'); }
 
-        // Keyboard Shortcuts
-        document.getElementById('postInput').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                addTreasure();
-            }
-        });
-        
-        document.getElementById('newCategoryInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                addCategory();
-            }
-        });
+        document.getElementById('postInput').addEventListener('keydown', function(e) { if (e.ctrlKey && e.key === 'Enter') addTreasure(); });
+        document.getElementById('newCategoryInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') addCategory(); });
 
-        // Initialize App
         salonTitle.innerText = currentCategory;
         initCategories();
         subscribePosts();
