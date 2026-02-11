@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Gilded Archive | Mobile Elegance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>The Gilded Archive | Mobile Fixed</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
 
     <style>
         /* * =========================================
-         * ROCOCO STYLESHEET (Responsive Edition)
+         * ROCOCO STYLESHEET (Mobile Optimized)
          * =========================================
          */
 
@@ -29,197 +29,212 @@
             --color-pink-deep: #e6a8d7;
             --color-text-main: #4a4a4a;
             --color-text-accent: #8b4513;
-            
             --shadow-soft: 0 10px 30px rgba(184, 134, 11, 0.15);
             
             --font-display: 'Great Vibes', cursive;
             --font-header: 'Cinzel', serif;
             --font-body: 'Playfair Display', serif;
             --font-ui: 'Lato', sans-serif;
+            
+            /* Safe Area for iPhone */
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--color-bg); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic)); border-radius: 10px; }
-
         body {
             background-color: var(--color-bg);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(248, 200, 220, 0.2) 0%, transparent 20%);
+            /* Simplified background for better mobile performance */
+            background-image: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
             color: var(--color-text-main);
             font-family: var(--font-body);
-            height: 100vh; /* Fallback */
-            height: 100dvh; /* Dynamic height for mobile */
+            height: 100vh; 
+            height: 100dvh; 
             overflow: hidden;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
         }
 
         #app-container {
-            width: 95vw;
-            height: 92vh;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--color-gold-metallic);
-            border-radius: 20px;
-            box-shadow: 0 0 0 4px var(--color-pink-soft), 0 0 0 6px var(--color-gold-metallic), var(--shadow-soft);
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.5);
         }
 
-        /* Decorative Corners (Desktop Only) */
-        #app-container::before, #app-container::after {
-            content: "❧"; position: absolute; font-size: 4rem; color: var(--color-gold-metallic); font-family: var(--font-display); z-index: 100; pointer-events: none;
-        }
-        #app-container::before { top: -10px; left: 10px; transform: rotate(-45deg); }
-        #app-container::after { bottom: -10px; right: 10px; transform: rotate(135deg); }
-
-        /* * SIDEBAR * */
+        /* * SIDEBAR (Mobile Drawer Logic) * */
         aside.sidebar {
             background: linear-gradient(180deg, #fffbf0 0%, #fff0f5 100%);
             border-right: 1px solid var(--color-gold-metallic);
-            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
-            position: relative;
-            z-index: 20;
-            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            gap: 1.5rem;
+            
+            /* Mobile Styles Default */
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 85%; max-width: 320px;
+            z-index: 1000;
+            transform: translateX(-100%); /* Hidden by default */
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.2);
+            padding: 2rem 1.5rem;
+            visibility: hidden; /* Prevent clicking when hidden */
         }
 
-        .brand-title { font-family: var(--font-display); font-size: 3rem; color: var(--color-gold-dark); text-align: center; text-shadow: 1px 1px 0px white; margin-bottom: 0.5rem; line-height: 1; }
-        .brand-subtitle { font-family: var(--font-header); font-size: 0.7rem; text-align: center; letter-spacing: 3px; color: var(--color-text-accent); text-transform: uppercase; border-bottom: 1px solid var(--color-gold-metallic); padding-bottom: 10px; }
+        /* When Open */
+        aside.sidebar.open {
+            transform: translateX(0);
+            visibility: visible;
+        }
 
-        .category-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; overflow-y: auto; padding-bottom: 20px; }
+        /* Desktop Override */
+        @media (min-width: 769px) {
+            body { 
+                justify-content: center; align-items: center; 
+                background-image: radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+                                  radial-gradient(circle at 90% 80%, rgba(248, 200, 220, 0.2) 0%, transparent 20%);
+            }
+            #app-container {
+                width: 95vw; height: 92vh;
+                border: 2px solid var(--color-gold-metallic);
+                border-radius: 20px;
+                box-shadow: 0 0 0 4px var(--color-pink-soft), 0 0 0 6px var(--color-gold-metallic), var(--shadow-soft);
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                background: rgba(255, 255, 255, 0.85);
+            }
+            aside.sidebar {
+                position: relative; transform: none; width: auto; max-width: none;
+                z-index: 1; box-shadow: none; visibility: visible;
+            }
+            .mobile-close-btn { display: none; }
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .brand-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-gold-dark); text-align: center; margin-bottom: 0.5rem; }
+        .brand-subtitle { font-family: var(--font-header); font-size: 0.7rem; text-align: center; letter-spacing: 2px; color: var(--color-text-accent); text-transform: uppercase; border-bottom: 1px solid var(--color-gold-metallic); padding-bottom: 10px; }
+
+        .category-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto; flex-grow: 1; }
         .category-item {
-            font-family: var(--font-header); font-size: 0.9rem; padding: 12px 15px; cursor: pointer; border: 1px solid transparent; transition: all 0.3s ease; border-radius: 8px; color: var(--color-text-main); display: flex; justify-content: space-between; align-items: center;
+            font-family: var(--font-header); font-size: 1rem; padding: 15px; cursor: pointer; border-radius: 8px; color: var(--color-text-main); display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent;
         }
-        .category-item:hover { background: white; border-color: var(--color-pink-soft); }
-        .category-item.active { background: white; border: 1px solid var(--color-gold-metallic); color: var(--color-gold-dark); font-weight: 700; box-shadow: 0 4px 10px rgba(212,175,55,0.1); }
+        .category-item:active, .category-item:hover { background: white; border-color: var(--color-pink-soft); }
+        .category-item.active { background: white; border: 1px solid var(--color-gold-metallic); color: var(--color-gold-dark); font-weight: 700; }
         .category-item.active::after { content: "⚜"; font-size: 1rem; }
 
         .add-category-btn {
-            margin-top: auto; background: transparent; border: 1px dashed var(--color-gold-metallic); color: var(--color-text-accent); padding: 12px; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+            background: white; border: 1px dashed var(--color-gold-metallic); color: var(--color-text-accent); padding: 15px; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--safe-bottom);
         }
 
         /* * MAIN CONTENT * */
-        main.content { display: flex; flex-direction: column; background-color: rgba(255, 255, 255, 0.4); position: relative; height: 100%; overflow: hidden; }
+        main.content { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
 
         header.top-bar { 
-            padding: 1rem 1.5rem; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.95); z-index: 10; height: 70px;
+            padding: 10px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.95); height: 60px; flex-shrink: 0;
         }
         
-        /* Mobile Menu Button (Hidden on Desktop) */
-        .mobile-menu-btn { display: none; font-size: 1.8rem; color: var(--color-gold-dark); background: none; border: none; cursor: pointer; padding: 5px; }
+        .mobile-menu-btn { 
+            font-size: 1.5rem; background: none; border: none; cursor: pointer; padding: 5px 10px 5px 0; color: var(--color-text-main);
+        }
+        .mobile-close-btn {
+            align-self: flex-end; font-size: 1.5rem; background: none; border: none; padding: 10px; color: var(--color-text-accent); cursor: pointer;
+        }
 
-        .current-salon { font-family: var(--font-header); font-size: 1.4rem; color: var(--color-gold-dark); display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .current-salon { font-family: var(--font-header); font-size: 1.1rem; color: var(--color-gold-dark); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 200px; }
 
-        /* Composer & Feed */
-        .feed-container { flex-grow: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .feed-container { 
+            flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; 
+            -webkit-overflow-scrolling: touch; 
+        }
 
-        .composer-area { padding: 1rem; background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); display: flex; gap: 0.8rem; align-items: flex-end; border-top: 1px solid rgba(212, 175, 55, 0.2); }
-        .input-group { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        /* Composer Area - iPhone Safe Area Fix */
+        .composer-area { 
+            padding: 10px 15px; 
+            padding-bottom: calc(10px + var(--safe-bottom));
+            background: white; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+            display: flex; gap: 10px; align-items: flex-start; 
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .input-group { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
         
         textarea.rococo-input {
-            width: 100%; border: 1px solid var(--color-pink-deep); border-radius: 8px; padding: 10px; font-family: var(--font-ui); font-size: 16px; /* Prevent iOS zoom */ resize: none; height: 50px; outline: none; background: var(--color-card); transition: 0.3s;
+            width: 100%; border: 1px solid var(--color-pink-deep); border-radius: 20px; padding: 10px 15px; font-family: var(--font-ui); font-size: 16px; resize: none; height: 45px; outline: none; background: var(--color-card); transition: 0.2s;
         }
-        textarea.rococo-input:focus { border-color: var(--color-gold-metallic); height: 80px; }
+        textarea.rococo-input:focus { border-color: var(--color-gold-metallic); height: 80px; border-radius: 10px; }
 
-        .file-upload-wrapper { display: flex; align-items: center; gap: 10px; }
-        .file-upload-label {
-            cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: var(--font-header); font-size: 0.75rem; color: var(--color-text-accent); padding: 5px 8px; border: 1px dashed var(--color-gold-metallic); border-radius: 5px; background: rgba(255,255,255,0.5);
-        }
-        .file-name-display { font-size: 0.7rem; color: var(--color-gold-dark); max-width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .file-upload-wrapper { display: flex; align-items: center; gap: 10px; margin-left: 5px; }
+        .file-upload-label { font-size: 1.2rem; cursor: pointer; opacity: 0.7; }
+        .file-name-display { font-size: 0.7rem; color: var(--color-gold-dark); max-width: 80px; overflow: hidden; white-space: nowrap; }
 
         .post-btn {
-            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark)); color: white; border: none; padding: 0 1rem; height: 50px; border-radius: 8px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; font-size: 0.9rem; min-width: 80px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark)); color: white; border: none; 
+            width: 45px; height: 45px; border-radius: 50%; /* Circle button for mobile */
+            font-family: var(--font-header); cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
         }
-
-        /* * MOBILE RESPONSIVE MAGIC * */
-        @media (max-width: 768px) {
-            body { background: var(--color-bg); } /* Simplify bg for mobile performance */
-            
-            #app-container {
-                width: 100%; height: 100%;
-                border: none; border-radius: 0; box-shadow: none;
-                grid-template-columns: 1fr; /* Single column */
-                display: flex; flex-direction: column;
-            }
-            
-            /* Hide decorative corners on mobile */
-            #app-container::before, #app-container::after { display: none; }
-
-            /* Sidebar becomes a drawer */
-            aside.sidebar {
-                position: fixed; top: 0; left: 0;
-                width: 80%; max-width: 300px; height: 100%;
-                box-shadow: 5px 0 30px rgba(0,0,0,0.1);
-                transform: translateX(-110%); /* Hidden by default */
-                transition: transform 0.3s ease-out;
-            }
-            aside.sidebar.open { transform: translateX(0); }
-
-            /* Overlay when sidebar is open */
-            .sidebar-overlay {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.3); backdrop-filter: blur(2px);
-                z-index: 15; display: none; opacity: 0; transition: opacity 0.3s;
-            }
-            .sidebar-overlay.active { display: block; opacity: 1; }
-
-            /* Show Hamburger Menu */
-            .mobile-menu-btn { display: block; }
-
-            /* Adjust Content */
-            .feed-container { padding: 1rem; }
-            .treasure-card { padding: 1rem; }
-            
-            /* Composer Adjustments */
-            .composer-area { padding: 10px; position: relative; bottom: 0; }
-        }
+        .post-btn span { display: block; margin-top: 2px; } /* Center visual */
 
         /* Cards */
         .treasure-card {
-            background: white; border: 1px solid var(--color-pink-soft); border-radius: 12px; padding: 1.5rem; position: relative; box-shadow: 0 4px 0 rgba(248, 200, 220, 0.5); transition: transform 0.2s;
+            background: white; border: 1px solid var(--color-pink-soft); border-radius: 12px; padding: 1.2rem; position: relative; box-shadow: 0 2px 5px rgba(248, 200, 220, 0.4);
         }
         .card-header { display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px dashed var(--color-pink-deep); padding-bottom: 0.5rem; }
-        .card-timestamp { font-size: 0.7rem; color: var(--color-text-accent); }
+        .card-timestamp { font-size: 0.75rem; color: var(--color-text-accent); }
         .card-content { font-size: 1rem; line-height: 1.5; color: var(--color-text-main); white-space: pre-wrap; word-wrap: break-word; }
         .card-content a { color: var(--color-gold-dark); text-decoration: none; border-bottom: 1px solid var(--color-gold-metallic); }
         
-        .card-media { margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-pink-soft); }
+        .card-media { margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-card); }
         .card-media img { width: 100%; height: auto; display: block; }
         
-        .card-actions { margin-top: 1rem; display: flex; justify-content: flex-end; gap: 15px; }
-        .action-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.7rem; cursor: pointer; padding: 5px; }
+        .card-actions { margin-top: 1rem; display: flex; justify-content: flex-end; gap: 20px; }
+        .action-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.8rem; cursor: pointer; padding: 5px; }
         .delete-btn { color: #cc8899; }
         .edit-btn { color: var(--color-gold-dark); }
 
-        /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-overlay.open { display: flex; }
-        .modal-box { background: white; padding: 2rem; border: 1px solid var(--color-gold-metallic); border-radius: 15px; box-shadow: 0 10px 40px rgba(184, 134, 11, 0.2); width: 90%; max-width: 400px; text-align: center; }
-        .modal-input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--color-pink-deep); border-radius: 5px; font-size: 1rem; }
-
-        .loading { text-align: center; color: var(--color-gold-dark); font-family: var(--font-header); margin-top: 20px; font-size: 0.9rem; opacity: 0.7; }
+        .modal-box { background: white; padding: 2rem; border: 1px solid var(--color-gold-metallic); border-radius: 15px; box-shadow: 0 10px 40px rgba(184, 134, 11, 0.2); width: 85%; max-width: 400px; text-align: center; }
+        .modal-input { width: 100%; padding: 15px; margin-bottom: 1.5rem; border: 1px solid var(--color-pink-deep); border-radius: 8px; font-size: 1rem; }
+        
+        .loading { text-align: center; color: var(--color-gold-dark); margin-top: 20px; opacity: 0.7; }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none; }
+            .post-btn { width: auto; height: 50px; border-radius: 8px; padding: 0 2rem; font-size: 0.9rem; }
+            .post-btn span { display: none; }
+            .post-btn::after { content: "Preserve"; }
+            textarea.rococo-input { border-radius: 5px; }
+            textarea.rococo-input:focus { border-radius: 5px; }
+            .composer-area { padding-bottom: 1.5rem; }
+        }
 
     </style>
-    <link rel="icon" href="IMG_9332.ico" type="image/x-icon">
+        <link rel="icon" href="IMG_9332.ico" type="image/x-icon">
 </head>
 <body>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
     <div id="app-container">
         <aside class="sidebar" id="sidebar">
+            <button class="mobile-close-btn" onclick="closeSidebar()">✕</button>
             <div>
                 <h1 class="brand-title">L'Archive</h1>
                 <div class="brand-subtitle">Cloud Collection</div>
@@ -233,36 +248,31 @@
 
         <main class="content">
             <header class="top-bar">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button class="mobile-menu-btn" onclick="toggleSidebar()">⚜️</button>
-                    
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
                     <div class="current-salon">
                         <span id="salonNameDisplay">Loading...</span>
                     </div>
                 </div>
-                
-                <div style="font-family: var(--font-header); font-size: 0.7rem; color: var(--color-text-accent); white-space: nowrap;">
-                    <span id="itemCount">0</span> Treasures
+                <div style="font-size: 0.7rem; color: var(--color-text-accent);">
+                    <span id="itemCount">0</span> Items
                 </div>
             </header>
 
             <div class="feed-container" id="feedContainer">
-                <div class="loading">Connecting to the Vault...</div>
+                <div class="loading">Connecting...</div>
             </div>
 
             <div class="composer-area">
                 <div class="input-group">
                     <textarea id="postInput" class="rococo-input" placeholder="Whisper..."></textarea>
-                    
                     <div class="file-upload-wrapper">
+                        <label for="fileInput" class="file-upload-label">📎</label>
                         <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect()">
-                        <label for="fileInput" class="file-upload-label">
-                            <span>📎</span> Attach
-                        </label>
                         <span id="fileNameDisplay" class="file-name-display"></span>
                     </div>
                 </div>
-                <button class="post-btn" id="postBtn" onclick="addTreasure()">Preserve</button>
+                <button class="post-btn" id="postBtn" onclick="addTreasure()"><span>✒️</span></button>
             </div>
         </main>
     </div>
@@ -271,27 +281,25 @@
         <div class="modal-box">
             <h2 style="font-family: var(--font-display); color: var(--color-gold-dark); margin-bottom: 1rem;">New Salon</h2>
             <input type="text" id="newCategoryInput" class="modal-input" placeholder="Name your sanctuary...">
-            <button class="post-btn" onclick="addCategory()">Create</button>
-            <button class="action-btn delete-btn" onclick="closeModal('category')" style="display:block; margin: 15px auto 0;">Dismiss</button>
+            <button class="post-btn" style="width:100%; border-radius:8px;" onclick="addCategory()"><span>Create</span></button>
+            <button class="action-btn delete-btn" onclick="closeModal('category')" style="margin-top:15px; display:block; width:100%;">Dismiss</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <h2 style="font-family: var(--font-display); color: var(--color-gold-dark); margin-bottom: 1rem;">Revise</h2>
-            <textarea id="editInput" class="rococo-input" style="height: 150px; margin-bottom: 20px; font-family: var(--font-body);"></textarea>
+            <textarea id="editInput" class="rococo-input" style="height: 120px; margin-bottom: 20px; font-family: var(--font-body); border-radius:8px;"></textarea>
             <input type="hidden" id="editId">
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <button class="post-btn" onclick="saveEdit()">Update</button>
-                <button class="action-btn delete-btn" onclick="closeModal('edit')" style="margin-top:0;">Cancel</button>
-            </div>
+            <button class="post-btn" style="width:100%; border-radius:8px;" onclick="saveEdit()"><span>Update</span></button>
+            <button class="action-btn delete-btn" onclick="closeModal('edit')" style="margin-top:15px; display:block; width:100%;">Cancel</button>
         </div>
     </div>
 
     <script>
         /**
          * =========================================
-         * THE ARCHIVIST ENGINE (Responsive + Storage)
+         * THE ARCHIVIST ENGINE (Fixed Mobile Interaction)
          * =========================================
          */
 
@@ -304,13 +312,7 @@
             appId: "1:240406501242:web:03c6f2bd9ff188151668c3"
         };
 
-        // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.error("Firebase Initialization Error:", error);
-        }
-
+        try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error(e); }
         const db = firebase.firestore();
         const storage = firebase.storage();
 
@@ -328,12 +330,10 @@
         const itemCount = document.getElementById('itemCount');
         const postBtn = document.getElementById('postBtn');
 
-        // Mobile Sidebar Logic
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
+        // --- Mobile Sidebar Logic (Crucial Fix) ---
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('active');
         }
 
         function closeSidebar() {
@@ -341,16 +341,12 @@
             document.getElementById('sidebarOverlay').classList.remove('active');
         }
 
-        /** CATEGORIES **/
+        /** DATA LOGIC **/
         function initCategories() {
             const catRef = db.collection('meta').doc('categories');
             catRef.onSnapshot((doc) => {
-                if (doc.exists) {
-                    categories = doc.data().list || ['General Salon'];
-                } else {
-                    catRef.set({ list: ['General Salon'] });
-                    categories = ['General Salon'];
-                }
+                categories = doc.exists ? (doc.data().list || ['General Salon']) : ['General Salon'];
+                if(!doc.exists) catRef.set({ list: categories });
                 renderCategories();
             });
         }
@@ -363,7 +359,8 @@
                 li.innerText = cat;
                 li.onclick = () => {
                     switchCategory(cat);
-                    if(window.innerWidth <= 768) closeSidebar(); // Auto close on mobile
+                    // Force close sidebar on mobile click
+                    if(window.innerWidth <= 768) closeSidebar();
                 };
                 categoryList.appendChild(li);
             });
@@ -376,28 +373,22 @@
             subscribePosts(); 
         }
 
-        /** POSTS **/
         function subscribePosts() {
             if (unsubscribePosts) unsubscribePosts();
-            feedContainer.innerHTML = '<div class="loading">Fetching Treasures...</div>';
+            feedContainer.innerHTML = '<div class="loading">Fetching...</div>';
 
             unsubscribePosts = db.collection('posts')
                 .where('category', '==', currentCategory)
                 .onSnapshot((snapshot) => {
                     allPostsCache = [];
-                    snapshot.forEach(doc => { allPostsCache.push({ id: doc.id, ...doc.data() }); });
+                    snapshot.forEach(doc => allPostsCache.push({ id: doc.id, ...doc.data() }));
                     
                     // Local Sort
-                    allPostsCache.sort((a, b) => {
-                        const timeA = a.timestamp ? a.timestamp.seconds : 0;
-                        const timeB = b.timestamp ? b.timestamp.seconds : 0;
-                        return timeB - timeA;
-                    });
-
+                    allPostsCache.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                     renderPosts(allPostsCache);
                 }, (error) => {
                     console.error(error);
-                    feedContainer.innerHTML = `<div class="loading" style="color:red">Error: ${error.message}</div>`;
+                    feedContainer.innerHTML = '<div class="loading">Offline / Error</div>';
                 });
         }
 
@@ -406,10 +397,7 @@
             itemCount.innerText = posts.length;
 
             if (posts.length === 0) {
-                feedContainer.innerHTML = `
-                    <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 1.5rem; opacity: 0.5; margin-top: 50px;">
-                        Empty...
-                    </div>`;
+                feedContainer.innerHTML = '<div class="loading" style="margin-top:50px;">Empty...</div>';
                 return;
             }
 
@@ -428,11 +416,9 @@
                 let mediaHtml = '';
                 if (post.mediaUrl) {
                     const isImage = post.mediaType && post.mediaType.startsWith('image/');
-                    if (isImage) {
-                        mediaHtml = `<div class="card-media"><img src="${post.mediaUrl}" loading="lazy" alt="Image"></div>`;
-                    } else {
-                        mediaHtml = `<a href="${post.mediaUrl}" target="_blank" style="display:block; margin-top:10px; font-size:0.8rem;">📎 Download Attachment</a>`;
-                    }
+                    mediaHtml = isImage 
+                        ? `<div class="card-media"><img src="${post.mediaUrl}" loading="lazy" alt="Image"></div>` 
+                        : `<a href="${post.mediaUrl}" target="_blank" style="display:block; margin-top:10px; font-size:0.8rem;">📎 Attachment</a>`;
                 }
 
                 card.innerHTML = `
@@ -454,15 +440,12 @@
         function linkify(text) {
             if (!text) return "";
             const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, function(url) {
-                return `<a href="${url}" target="_blank">${url}</a>`;
-            });
+            return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`);
         }
 
-        /** ACTIONS **/
         function handleFileSelect() {
             selectedFile = document.getElementById('fileInput').files[0];
-            document.getElementById('fileNameDisplay').innerText = selectedFile ? selectedFile.name : "";
+            document.getElementById('fileNameDisplay').innerText = selectedFile ? "Selected" : "";
         }
 
         async function addTreasure() {
@@ -471,17 +454,16 @@
 
             if (!content && !selectedFile) return;
 
+            const originalBtnText = postBtn.innerHTML;
             postBtn.disabled = true;
-            postBtn.innerText = "...";
+            postBtn.innerHTML = "⏳";
 
-            let mediaUrl = null;
-            let mediaType = null;
+            let mediaUrl = null, mediaType = null;
 
             try {
                 if (selectedFile) {
                     const fileName = Date.now() + '-' + selectedFile.name;
-                    const storageRef = storage.ref().child('salon_uploads/' + fileName);
-                    const snapshot = await storageRef.put(selectedFile);
+                    const snapshot = await storage.ref().child('salon_uploads/' + fileName).put(selectedFile);
                     mediaUrl = await snapshot.ref.getDownloadURL();
                     mediaType = selectedFile.type;
                 }
@@ -500,45 +482,38 @@
                 document.getElementById('fileNameDisplay').innerText = '';
                 
             } catch (error) {
-                alert("Upload failed: " + error.message);
+                alert("Error: " + error.message);
             } finally {
                 postBtn.disabled = false;
-                postBtn.innerText = "Preserve";
+                postBtn.innerHTML = originalBtnText;
             }
         }
 
-        function deletePost(docId) {
-            if(confirm("Discard this treasure?")) {
-                db.collection('posts').doc(docId).delete();
-            }
+        function deletePost(id) {
+            if(confirm("Discard?")) db.collection('posts').doc(id).delete();
         }
 
         function saveEdit() {
             const id = document.getElementById('editId').value;
             const content = document.getElementById('editInput').value.trim();
-            if (!content) return;
-            db.collection('posts').doc(id).update({ content: content })
-                .then(() => closeModal('edit'));
+            if (content) db.collection('posts').doc(id).update({ content }).then(() => closeModal('edit'));
         }
 
         function addCategory() {
             const name = document.getElementById('newCategoryInput').value.trim();
             if (name && !categories.includes(name)) {
                 db.collection('meta').doc('categories').set({ list: [...categories, name] })
-                    .then(() => {
-                        closeModal('category');
-                        switchCategory(name);
-                    });
+                    .then(() => { closeModal('category'); switchCategory(name); });
             }
         }
 
-        /** MODALS **/
         function openEditModal(id) {
             const post = allPostsCache.find(p => p.id === id);
-            if (!post) return;
-            document.getElementById('editId').value = id;
-            document.getElementById('editInput').value = post.content;
-            openModal('edit');
+            if (post) {
+                document.getElementById('editId').value = id;
+                document.getElementById('editInput').value = post.content;
+                openModal('edit');
+            }
         }
 
         function openModal(type) { 
