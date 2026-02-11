@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gilded Archive | Le Journal Secret</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Gilded Archive | Mobile Elegance</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,10 +11,11 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
         /* * =========================================
-         * ROCOCO STYLESHEET
+         * ROCOCO STYLESHEET (Responsive Edition)
          * =========================================
          */
 
@@ -37,11 +38,12 @@
             --font-ui: 'Lato', sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--color-gold-metallic) var(--color-bg); }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        ::-webkit-scrollbar { width: 8px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--color-bg); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic)); border-radius: 10px; border: 1px solid var(--color-gold-dark); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--color-gold-light), var(--color-gold-metallic)); border-radius: 10px; }
 
         body {
             background-color: var(--color-bg);
@@ -50,7 +52,8 @@
                 radial-gradient(circle at 90% 80%, rgba(248, 200, 220, 0.2) 0%, transparent 20%);
             color: var(--color-text-main);
             font-family: var(--font-body);
-            height: 100vh;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Dynamic height for mobile */
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -60,31 +63,26 @@
         #app-container {
             width: 95vw;
             height: 92vh;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border: 2px solid var(--color-gold-metallic);
             border-radius: 20px;
-            box-shadow: 
-                0 0 0 4px var(--color-pink-soft),
-                0 0 0 6px var(--color-gold-metallic),
-                var(--shadow-soft);
+            box-shadow: 0 0 0 4px var(--color-pink-soft), 0 0 0 6px var(--color-gold-metallic), var(--shadow-soft);
             display: grid;
             grid-template-columns: 280px 1fr;
             overflow: hidden;
             position: relative;
+            transition: 0.3s;
         }
 
-        @media (max-width: 768px) {
-            #app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-            aside.sidebar { display: none; }
-        }
-
+        /* Decorative Corners (Desktop Only) */
         #app-container::before, #app-container::after {
             content: "❧"; position: absolute; font-size: 4rem; color: var(--color-gold-metallic); font-family: var(--font-display); z-index: 100; pointer-events: none;
         }
         #app-container::before { top: -10px; left: 10px; transform: rotate(-45deg); }
         #app-container::after { bottom: -10px; right: 10px; transform: rotate(135deg); }
 
+        /* * SIDEBAR * */
         aside.sidebar {
             background: linear-gradient(180deg, #fffbf0 0%, #fff0f5 100%);
             border-right: 1px solid var(--color-gold-metallic);
@@ -93,87 +91,135 @@
             flex-direction: column;
             gap: 2rem;
             position: relative;
+            z-index: 20;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        .brand-title { font-family: var(--font-display); font-size: 3rem; color: var(--color-gold-dark); text-align: center; text-shadow: 1px 1px 0px white; margin-bottom: 1rem; line-height: 1; }
+        .brand-title { font-family: var(--font-display); font-size: 3rem; color: var(--color-gold-dark); text-align: center; text-shadow: 1px 1px 0px white; margin-bottom: 0.5rem; line-height: 1; }
         .brand-subtitle { font-family: var(--font-header); font-size: 0.7rem; text-align: center; letter-spacing: 3px; color: var(--color-text-accent); text-transform: uppercase; border-bottom: 1px solid var(--color-gold-metallic); padding-bottom: 10px; }
 
-        .category-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; overflow-y: auto; }
+        .category-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; overflow-y: auto; padding-bottom: 20px; }
         .category-item {
-            font-family: var(--font-header); font-size: 0.9rem; padding: 10px 15px; cursor: pointer; border: 1px solid transparent; transition: all 0.4s ease; border-radius: 8px; position: relative; color: var(--color-text-main); display: flex; justify-content: space-between; align-items: center;
+            font-family: var(--font-header); font-size: 0.9rem; padding: 12px 15px; cursor: pointer; border: 1px solid transparent; transition: all 0.3s ease; border-radius: 8px; color: var(--color-text-main); display: flex; justify-content: space-between; align-items: center;
         }
-        .category-item:hover { background: white; border-color: var(--color-pink-soft); color: var(--color-gold-dark); box-shadow: var(--shadow-soft); }
-        .category-item.active { background: white; border: 1px solid var(--color-gold-metallic); color: var(--color-gold-dark); font-weight: 700; }
+        .category-item:hover { background: white; border-color: var(--color-pink-soft); }
+        .category-item.active { background: white; border: 1px solid var(--color-gold-metallic); color: var(--color-gold-dark); font-weight: 700; box-shadow: 0 4px 10px rgba(212,175,55,0.1); }
         .category-item.active::after { content: "⚜"; font-size: 1rem; }
 
         .add-category-btn {
-            margin-top: auto; background: transparent; border: 1px dashed var(--color-gold-metallic); color: var(--color-text-accent); padding: 10px; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: 0.8rem; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+            margin-top: auto; background: transparent; border: 1px dashed var(--color-gold-metallic); color: var(--color-text-accent); padding: 12px; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
         }
-        .add-category-btn:hover { background: rgba(255,255,255,0.5); border-style: solid; }
 
-        main.content { display: flex; flex-direction: column; background-color: rgba(255, 255, 255, 0.4); position: relative; }
+        /* * MAIN CONTENT * */
+        main.content { display: flex; flex-direction: column; background-color: rgba(255, 255, 255, 0.4); position: relative; height: 100%; overflow: hidden; }
 
-        header.top-bar { padding: 1.5rem 2rem; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); }
-        .current-salon { font-family: var(--font-header); font-size: 1.5rem; color: var(--color-gold-dark); display: flex; align-items: center; gap: 10px; }
+        header.top-bar { 
+            padding: 1rem 1.5rem; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.95); z-index: 10; height: 70px;
+        }
+        
+        /* Mobile Menu Button (Hidden on Desktop) */
+        .mobile-menu-btn { display: none; font-size: 1.8rem; color: var(--color-gold-dark); background: none; border: none; cursor: pointer; padding: 5px; }
 
-        .composer-area { padding: 1.5rem 2rem; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; gap: 1rem; align-items: flex-start; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-        .input-group { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+        .current-salon { font-family: var(--font-header); font-size: 1.4rem; color: var(--color-gold-dark); display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        /* Composer & Feed */
+        .feed-container { flex-grow: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+
+        .composer-area { padding: 1rem; background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); display: flex; gap: 0.8rem; align-items: flex-end; border-top: 1px solid rgba(212, 175, 55, 0.2); }
+        .input-group { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        
         textarea.rococo-input {
-            width: 100%; border: 1px solid var(--color-pink-deep); border-radius: 5px; padding: 10px; font-family: var(--font-ui); font-size: 1rem; resize: none; height: 60px; outline: none; background: var(--color-card); transition: 0.3s;
+            width: 100%; border: 1px solid var(--color-pink-deep); border-radius: 8px; padding: 10px; font-family: var(--font-ui); font-size: 16px; /* Prevent iOS zoom */ resize: none; height: 50px; outline: none; background: var(--color-card); transition: 0.3s;
         }
-        textarea.rococo-input:focus { border-color: var(--color-gold-metallic); box-shadow: 0 0 8px var(--color-pink-soft); }
+        textarea.rococo-input:focus { border-color: var(--color-gold-metallic); height: 80px; }
+
+        .file-upload-wrapper { display: flex; align-items: center; gap: 10px; }
+        .file-upload-label {
+            cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: var(--font-header); font-size: 0.75rem; color: var(--color-text-accent); padding: 5px 8px; border: 1px dashed var(--color-gold-metallic); border-radius: 5px; background: rgba(255,255,255,0.5);
+        }
+        .file-name-display { font-size: 0.7rem; color: var(--color-gold-dark); max-width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
         .post-btn {
-            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark)); color: white; border: none; padding: 0 2rem; height: 60px; border-radius: 5px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+            background: linear-gradient(45deg, var(--color-gold-metallic), var(--color-gold-dark)); color: white; border: none; padding: 0 1rem; height: 50px; border-radius: 8px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; font-size: 0.9rem; min-width: 80px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         }
-        .post-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3); }
-        .post-btn::after {
-            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s;
+
+        /* * MOBILE RESPONSIVE MAGIC * */
+        @media (max-width: 768px) {
+            body { background: var(--color-bg); } /* Simplify bg for mobile performance */
+            
+            #app-container {
+                width: 100%; height: 100%;
+                border: none; border-radius: 0; box-shadow: none;
+                grid-template-columns: 1fr; /* Single column */
+                display: flex; flex-direction: column;
+            }
+            
+            /* Hide decorative corners on mobile */
+            #app-container::before, #app-container::after { display: none; }
+
+            /* Sidebar becomes a drawer */
+            aside.sidebar {
+                position: fixed; top: 0; left: 0;
+                width: 80%; max-width: 300px; height: 100%;
+                box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+                transform: translateX(-110%); /* Hidden by default */
+                transition: transform 0.3s ease-out;
+            }
+            aside.sidebar.open { transform: translateX(0); }
+
+            /* Overlay when sidebar is open */
+            .sidebar-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.3); backdrop-filter: blur(2px);
+                z-index: 15; display: none; opacity: 0; transition: opacity 0.3s;
+            }
+            .sidebar-overlay.active { display: block; opacity: 1; }
+
+            /* Show Hamburger Menu */
+            .mobile-menu-btn { display: block; }
+
+            /* Adjust Content */
+            .feed-container { padding: 1rem; }
+            .treasure-card { padding: 1rem; }
+            
+            /* Composer Adjustments */
+            .composer-area { padding: 10px; position: relative; bottom: 0; }
         }
-        .post-btn:hover::after { left: 100%; }
 
-        .feed-container { flex-grow: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; scroll-behavior: smooth; }
-
+        /* Cards */
         .treasure-card {
-            background: white; border: 1px solid var(--color-pink-soft); border-radius: 10px; padding: 1.5rem; position: relative; box-shadow: 5px 5px 0 rgba(248, 200, 220, 0.5); transition: transform 0.3s; animation: fadeIn 0.5s ease-out;
+            background: white; border: 1px solid var(--color-pink-soft); border-radius: 12px; padding: 1.5rem; position: relative; box-shadow: 0 4px 0 rgba(248, 200, 220, 0.5); transition: transform 0.2s;
         }
-        .treasure-card:hover { transform: translateY(-3px); border-color: var(--color-gold-metallic); }
-        .treasure-card::before {
-            content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; pointer-events: none;
-        }
-
-        .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--color-pink-deep); padding-bottom: 0.5rem; }
-        .card-timestamp { font-family: var(--font-header); font-size: 0.75rem; color: var(--color-text-accent); opacity: 0.7; }
-        .card-content { font-family: var(--font-body); font-size: 1.1rem; line-height: 1.6; color: var(--color-text-main); white-space: pre-wrap; word-wrap: break-word; }
-        .card-content a { color: var(--color-gold-dark); text-decoration: none; border-bottom: 1px solid var(--color-gold-metallic); font-style: italic; transition: 0.2s; }
-        .card-content a:hover { background-color: var(--color-gold-light); color: black; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px dashed var(--color-pink-deep); padding-bottom: 0.5rem; }
+        .card-timestamp { font-size: 0.7rem; color: var(--color-text-accent); }
+        .card-content { font-size: 1rem; line-height: 1.5; color: var(--color-text-main); white-space: pre-wrap; word-wrap: break-word; }
+        .card-content a { color: var(--color-gold-dark); text-decoration: none; border-bottom: 1px solid var(--color-gold-metallic); }
+        
+        .card-media { margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-pink-soft); }
+        .card-media img { width: 100%; height: auto; display: block; }
         
         .card-actions { margin-top: 1rem; display: flex; justify-content: flex-end; gap: 15px; }
-        
-        .delete-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.7rem; color: #cc8899; cursor: pointer; opacity: 0.5; transition: 0.3s; }
-        .delete-btn:hover { opacity: 1; color: #d6336c; text-decoration: underline; }
-        
-        .edit-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.7rem; color: var(--color-gold-dark); cursor: pointer; opacity: 0.6; transition: 0.3s; }
-        .edit-btn:hover { opacity: 1; text-shadow: 0 0 5px var(--color-gold-light); text-decoration: underline; }
+        .action-btn { background: none; border: none; font-family: var(--font-header); font-size: 0.7rem; cursor: pointer; padding: 5px; }
+        .delete-btn { color: #cc8899; }
+        .edit-btn { color: var(--color-gold-dark); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.open { display: flex; }
-        .modal-box { background: white; padding: 2rem; border: 2px solid var(--color-gold-metallic); border-radius: 15px; box-shadow: var(--shadow-soft); width: 500px; text-align: center; max-width: 90vw; }
-        .modal-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-gold-dark); margin-bottom: 1rem; }
-        .modal-input { width: 100%; padding: 10px; margin-bottom: 1rem; border: 1px solid var(--color-pink-deep); font-family: var(--font-header); }
+        .modal-box { background: white; padding: 2rem; border: 1px solid var(--color-gold-metallic); border-radius: 15px; box-shadow: 0 10px 40px rgba(184, 134, 11, 0.2); width: 90%; max-width: 400px; text-align: center; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--color-pink-deep); border-radius: 5px; font-size: 1rem; }
 
-        .loading { text-align: center; color: var(--color-gold-dark); font-family: var(--font-header); margin-top: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .loading { text-align: center; color: var(--color-gold-dark); font-family: var(--font-header); margin-top: 20px; font-size: 0.9rem; opacity: 0.7; }
 
     </style>
     <link rel="icon" href="IMG_9332.ico" type="image/x-icon">
 </head>
 <body>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <div id="app-container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div>
                 <h1 class="brand-title">L'Archive</h1>
                 <div class="brand-subtitle">Cloud Collection</div>
@@ -187,11 +233,16 @@
 
         <main class="content">
             <header class="top-bar">
-                <div class="current-salon">
-                    <span>⚜</span> <span id="salonNameDisplay">Loading...</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">⚜️</button>
+                    
+                    <div class="current-salon">
+                        <span id="salonNameDisplay">Loading...</span>
+                    </div>
                 </div>
-                <div style="font-family: var(--font-header); font-size: 0.8rem; color: var(--color-text-accent);">
-                    <span id="itemCount">...</span> Treasures
+                
+                <div style="font-family: var(--font-header); font-size: 0.7rem; color: var(--color-text-accent); white-space: nowrap;">
+                    <span id="itemCount">0</span> Treasures
                 </div>
             </header>
 
@@ -201,30 +252,38 @@
 
             <div class="composer-area">
                 <div class="input-group">
-                    <textarea id="postInput" class="rococo-input" placeholder="Whisper your findings to the cloud..."></textarea>
+                    <textarea id="postInput" class="rococo-input" placeholder="Whisper..."></textarea>
+                    
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect()">
+                        <label for="fileInput" class="file-upload-label">
+                            <span>📎</span> Attach
+                        </label>
+                        <span id="fileNameDisplay" class="file-name-display"></span>
+                    </div>
                 </div>
-                <button class="post-btn" onclick="addTreasure()">Preserve</button>
+                <button class="post-btn" id="postBtn" onclick="addTreasure()">Preserve</button>
             </div>
         </main>
     </div>
 
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-box">
-            <h2 class="modal-title">New Salon</h2>
+            <h2 style="font-family: var(--font-display); color: var(--color-gold-dark); margin-bottom: 1rem;">New Salon</h2>
             <input type="text" id="newCategoryInput" class="modal-input" placeholder="Name your sanctuary...">
             <button class="post-btn" onclick="addCategory()">Create</button>
-            <button class="delete-btn" onclick="closeModal('category')" style="display:block; margin: 10px auto;">Dismiss</button>
+            <button class="action-btn delete-btn" onclick="closeModal('category')" style="display:block; margin: 15px auto 0;">Dismiss</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
-            <h2 class="modal-title">Revise Treasure</h2>
+            <h2 style="font-family: var(--font-display); color: var(--color-gold-dark); margin-bottom: 1rem;">Revise</h2>
             <textarea id="editInput" class="rococo-input" style="height: 150px; margin-bottom: 20px; font-family: var(--font-body);"></textarea>
             <input type="hidden" id="editId">
             <div style="display: flex; justify-content: center; gap: 15px;">
                 <button class="post-btn" onclick="saveEdit()">Update</button>
-                <button class="delete-btn" onclick="closeModal('edit')" style="margin-top:0;">Cancel</button>
+                <button class="action-btn delete-btn" onclick="closeModal('edit')" style="margin-top:0;">Cancel</button>
             </div>
         </div>
     </div>
@@ -232,7 +291,7 @@
     <script>
         /**
          * =========================================
-         * THE ARCHIVIST ENGINE (Edition: Cloud + Edit)
+         * THE ARCHIVIST ENGINE (Responsive + Storage)
          * =========================================
          */
 
@@ -253,25 +312,38 @@
         }
 
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        // State Management
+        // State
         let currentCategory = 'General Salon';
         let categories = ['General Salon']; 
-        let allPostsCache = []; // Cache to store post data for editing
+        let allPostsCache = []; 
         let unsubscribePosts = null;
+        let selectedFile = null;
 
-        // DOM Elements
+        // UI Refs
         const feedContainer = document.getElementById('feedContainer');
         const categoryList = document.getElementById('categoryList');
         const salonTitle = document.getElementById('salonNameDisplay');
         const itemCount = document.getElementById('itemCount');
+        const postBtn = document.getElementById('postBtn');
 
-        /**
-         * 1. LISTEN TO CATEGORIES
-         */
+        // Mobile Sidebar Logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        /** CATEGORIES **/
         function initCategories() {
             const catRef = db.collection('meta').doc('categories');
-
             catRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     categories = doc.data().list || ['General Salon'];
@@ -283,48 +355,16 @@
             });
         }
 
-        /**
-         * 2. LISTEN TO POSTS (FIXED for No Index Required)
-         */
-        function subscribePosts() {
-            if (unsubscribePosts) {
-                unsubscribePosts();
-            }
-
-            feedContainer.innerHTML = '<div class="loading">Fetching Treasures...</div>';
-
-            unsubscribePosts = db.collection('posts')
-                .where('category', '==', currentCategory)
-                .onSnapshot((snapshot) => {
-                    
-                    // Convert to array and Sort LOCALLY
-                    allPostsCache = [];
-                    snapshot.forEach(doc => {
-                        allPostsCache.push({ id: doc.id, ...doc.data() });
-                    });
-
-                    // Sort newest first
-                    allPostsCache.sort((a, b) => {
-                        const timeA = a.timestamp ? a.timestamp.seconds : 0;
-                        const timeB = b.timestamp ? b.timestamp.seconds : 0;
-                        return timeB - timeA;
-                    });
-
-                    renderPosts(allPostsCache);
-
-                }, (error) => {
-                    console.error("Error fetching posts:", error);
-                    feedContainer.innerHTML = `<div class="loading" style="color:red">Error: ${error.message}</div>`;
-                });
-        }
-
         function renderCategories() {
             categoryList.innerHTML = '';
             categories.forEach(cat => {
                 const li = document.createElement('li');
                 li.className = `category-item ${cat === currentCategory ? 'active' : ''}`;
                 li.innerText = cat;
-                li.onclick = () => switchCategory(cat);
+                li.onclick = () => {
+                    switchCategory(cat);
+                    if(window.innerWidth <= 768) closeSidebar(); // Auto close on mobile
+                };
                 categoryList.appendChild(li);
             });
         }
@@ -336,19 +376,40 @@
             subscribePosts(); 
         }
 
-        /**
-         * Render Posts
-         */
+        /** POSTS **/
+        function subscribePosts() {
+            if (unsubscribePosts) unsubscribePosts();
+            feedContainer.innerHTML = '<div class="loading">Fetching Treasures...</div>';
+
+            unsubscribePosts = db.collection('posts')
+                .where('category', '==', currentCategory)
+                .onSnapshot((snapshot) => {
+                    allPostsCache = [];
+                    snapshot.forEach(doc => { allPostsCache.push({ id: doc.id, ...doc.data() }); });
+                    
+                    // Local Sort
+                    allPostsCache.sort((a, b) => {
+                        const timeA = a.timestamp ? a.timestamp.seconds : 0;
+                        const timeB = b.timestamp ? b.timestamp.seconds : 0;
+                        return timeB - timeA;
+                    });
+
+                    renderPosts(allPostsCache);
+                }, (error) => {
+                    console.error(error);
+                    feedContainer.innerHTML = `<div class="loading" style="color:red">Error: ${error.message}</div>`;
+                });
+        }
+
         function renderPosts(posts) {
             feedContainer.innerHTML = '';
             itemCount.innerText = posts.length;
 
             if (posts.length === 0) {
                 feedContainer.innerHTML = `
-                    <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 2rem; opacity: 0.5; margin-top: 50px;">
-                        This salon is empty.<br>Fill it with beauty.
-                    </div>
-                `;
+                    <div style="text-align:center; color: #b8860b; font-family: var(--font-display); font-size: 1.5rem; opacity: 0.5; margin-top: 50px;">
+                        Empty...
+                    </div>`;
                 return;
             }
 
@@ -359,21 +420,31 @@
                 let dateString = "Just now";
                 if (post.timestamp) {
                     const dateObj = new Date(post.timestamp.seconds * 1000);
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
-                    dateString = dateObj.toLocaleDateString('en-GB', options);
+                    dateString = dateObj.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
                 }
 
                 const contentHtml = linkify(post.content);
+                
+                let mediaHtml = '';
+                if (post.mediaUrl) {
+                    const isImage = post.mediaType && post.mediaType.startsWith('image/');
+                    if (isImage) {
+                        mediaHtml = `<div class="card-media"><img src="${post.mediaUrl}" loading="lazy" alt="Image"></div>`;
+                    } else {
+                        mediaHtml = `<a href="${post.mediaUrl}" target="_blank" style="display:block; margin-top:10px; font-size:0.8rem;">📎 Download Attachment</a>`;
+                    }
+                }
 
                 card.innerHTML = `
                     <div class="card-header">
-                        <span class="card-timestamp">Recorded on ${dateString}</span>
+                        <span class="card-timestamp">${dateString}</span>
                         <span style="color:var(--color-gold-dark)">✦</span>
                     </div>
                     <div class="card-content">${contentHtml}</div>
+                    ${mediaHtml}
                     <div class="card-actions">
-                        <button class="edit-btn" onclick="openEditModal('${post.id}')">Revise</button>
-                        <button class="delete-btn" onclick="deletePost('${post.id}')">Discard</button>
+                        <button class="action-btn edit-btn" onclick="openEditModal('${post.id}')">Revise</button>
+                        <button class="action-btn delete-btn" onclick="deletePost('${post.id}')">Discard</button>
                     </div>
                 `;
                 feedContainer.appendChild(card);
@@ -384,97 +455,100 @@
             if (!text) return "";
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) {
-                return `<a href="${url}" target="_blank" title="Open this treasure">${url}</a>`;
+                return `<a href="${url}" target="_blank">${url}</a>`;
             });
         }
 
-        function addTreasure() {
+        /** ACTIONS **/
+        function handleFileSelect() {
+            selectedFile = document.getElementById('fileInput').files[0];
+            document.getElementById('fileNameDisplay').innerText = selectedFile ? selectedFile.name : "";
+        }
+
+        async function addTreasure() {
             const input = document.getElementById('postInput');
             const content = input.value.trim();
-            if (!content) return;
 
-            db.collection('posts').add({
-                category: currentCategory,
-                content: content,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
+            if (!content && !selectedFile) return;
+
+            postBtn.disabled = true;
+            postBtn.innerText = "...";
+
+            let mediaUrl = null;
+            let mediaType = null;
+
+            try {
+                if (selectedFile) {
+                    const fileName = Date.now() + '-' + selectedFile.name;
+                    const storageRef = storage.ref().child('salon_uploads/' + fileName);
+                    const snapshot = await storageRef.put(selectedFile);
+                    mediaUrl = await snapshot.ref.getDownloadURL();
+                    mediaType = selectedFile.type;
+                }
+
+                await db.collection('posts').add({
+                    category: currentCategory,
+                    content: content,
+                    mediaUrl: mediaUrl,
+                    mediaType: mediaType,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
                 input.value = ''; 
-            }).catch((error) => {
-                console.error("Error adding: ", error);
-                alert("Connection failed.");
-            });
-        }
-
-        function deletePost(docId) {
-            if(confirm("Are you certain?")) {
-                db.collection('posts').doc(docId).delete();
+                document.getElementById('fileInput').value = '';
+                selectedFile = null;
+                document.getElementById('fileNameDisplay').innerText = '';
+                
+            } catch (error) {
+                alert("Upload failed: " + error.message);
+            } finally {
+                postBtn.disabled = false;
+                postBtn.innerText = "Preserve";
             }
         }
 
-        /**
-         * EDITING LOGIC
-         */
-        function openEditModal(id) {
-            // Find the post data from our local cache
-            const post = allPostsCache.find(p => p.id === id);
-            if (!post) return;
-
-            document.getElementById('editId').value = id;
-            document.getElementById('editInput').value = post.content;
-            
-            openModal('edit');
+        function deletePost(docId) {
+            if(confirm("Discard this treasure?")) {
+                db.collection('posts').doc(docId).delete();
+            }
         }
 
         function saveEdit() {
             const id = document.getElementById('editId').value;
             const content = document.getElementById('editInput').value.trim();
-
             if (!content) return;
-
-            db.collection('posts').doc(id).update({
-                content: content
-                // We deliberately don't update timestamp to keep original date
-            }).then(() => {
-                closeModal('edit');
-            }).catch(error => {
-                alert("Could not update treasure.");
-                console.error(error);
-            });
+            db.collection('posts').doc(id).update({ content: content })
+                .then(() => closeModal('edit'));
         }
 
         function addCategory() {
-            const input = document.getElementById('newCategoryInput');
-            const name = input.value.trim();
+            const name = document.getElementById('newCategoryInput').value.trim();
             if (name && !categories.includes(name)) {
-                const newList = [...categories, name];
-                db.collection('meta').doc('categories').set({ list: newList })
+                db.collection('meta').doc('categories').set({ list: [...categories, name] })
                     .then(() => {
                         closeModal('category');
                         switchCategory(name);
-                        input.value = '';
                     });
-            } else if (categories.includes(name)) {
-                alert("That salon already exists.");
             }
         }
 
-        // Modified Modal Logic to handle multiple modals
+        /** MODALS **/
+        function openEditModal(id) {
+            const post = allPostsCache.find(p => p.id === id);
+            if (!post) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('editInput').value = post.content;
+            openModal('edit');
+        }
+
         function openModal(type) { 
-            const modalId = type === 'category' ? 'categoryModal' : 'editModal';
-            document.getElementById(modalId).classList.add('open'); 
-            
-            if(type === 'category') document.getElementById('newCategoryInput').focus();
-            if(type === 'edit') document.getElementById('editInput').focus();
+            document.getElementById(type === 'category' ? 'categoryModal' : 'editModal').classList.add('open'); 
         }
-
         function closeModal(type) { 
-            const modalId = type === 'category' ? 'categoryModal' : 'editModal';
-            document.getElementById(modalId).classList.remove('open'); 
+            document.getElementById(type === 'category' ? 'categoryModal' : 'editModal').classList.remove('open'); 
         }
 
-        document.getElementById('postInput').addEventListener('keydown', function(e) { if (e.ctrlKey && e.key === 'Enter') addTreasure(); });
-        document.getElementById('newCategoryInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') addCategory(); });
-
+        // Init
         salonTitle.innerText = currentCategory;
         initCategories();
         subscribePosts();
